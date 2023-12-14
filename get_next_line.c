@@ -6,7 +6,7 @@
 /*   By: moichou <moichou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/28 21:15:54 by moichou           #+#    #+#             */
-/*   Updated: 2023/12/13 15:15:42 by moichou          ###   ########.fr       */
+/*   Updated: 2023/12/14 11:08:33 by moichou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,19 @@ char *ft_read(int fd, char *result)
 
     buffer = malloc(sizeof(char) * BUFFER_SIZE + 1);
     if (!buffer)
-        return (NULL);
+        return (free(result), NULL);
     count = 1;
     while (count > 0 && ft_strsearch(result, '\n') == 0)
     {
         count = read(fd, buffer, BUFFER_SIZE);
         if (count == -1)
-            return (free(buffer), NULL);
+            return (free(buffer), free(result), NULL);
         buffer[count] = '\0';
         result = ft_strjoin(result, buffer);
-        if (!result)
-            return (free(buffer), NULL);
+        if (count == 0)
+            break;
     }
-    return (free(buffer), result);
+    return (free(buffer), buffer = NULL, result);
 }
 
 char *ft_extract_line(char *result)
@@ -41,20 +41,22 @@ char *ft_extract_line(char *result)
     int i = 0;
     int j;
 
+    if (!result || *result == '\0')
+        return (NULL);
     while (result[i] != '\n' && result[i])
         i++;
     if (result[i] == '\n')
         i++;
     str = malloc(sizeof(char) * i + 1);
     if (!str)
-        return (NULL);
+        return (free(result), NULL);
     j = 0;
     while (j < i)
     {
         str[j] = result[j];
         j++;
     }
-    str[i] = '\0';
+    str[j] = '\0';
     return (str);
 }
 
@@ -69,9 +71,11 @@ char *ft_extract_rest(char *result)
         i++;
     if (result[i] == '\n')
         i++;
+    if (*result == '\0')
+        return (free(result), NULL);
     str = malloc(sizeof(char) * strlen(result + i) + 1);
     if (!str)
-        return (NULL);
+        return (free(result), NULL);
     j = 0;
     while (result[i] != '\0')
     {
@@ -80,7 +84,7 @@ char *ft_extract_rest(char *result)
         i++;
     }
     str[j] = '\0';
-    return (str);
+    return (free(result), str);
 }
 
 // free line after using it
@@ -92,16 +96,20 @@ char *get_next_line(int fd)
     if (fd < 0 || fd > OPEN_MAX || BUFFER_SIZE <= 0 || BUFFER_SIZE >= INT_MAX)
         return (NULL);
     if (!result)
-        result = strdup("");
+    {
+        result = ft_strdup("");
+        if (!result)
+            return (NULL);
+    }
     result = ft_read(fd, result);
     if (!result)
-        return (NULL);
-    if (result[0] == '\0')
-        return (free(result), NULL);
-    line = ft_extract_line(result); 
+        return (free(result),result = NULL, NULL);
+    line = ft_extract_line(result);
     if (!line)
-        return (NULL);
+        return (free(result),result = NULL, NULL);
     result = ft_extract_rest(result);
+    if (!result)
+        return (NULL);
     return (line);
 }
 
@@ -113,18 +121,6 @@ char *get_next_line(int fd)
 //         printf("error fd");
 //         return 0;
 //     }
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     printf("%s", get_next_line(fd));
-//     // get_next_line(fd);
-//     // get_next_line(fd);
-//     // get_next_line(fd);
-//     // get_next_line(fd);
-//     // get_next_line(fd);
+//     char *line = get_next_line(fd);
 //     return (0);
 // }
