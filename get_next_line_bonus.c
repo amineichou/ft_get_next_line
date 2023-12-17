@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: moichou <moichou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/28 21:15:54 by moichou           #+#    #+#             */
-/*   Updated: 2023/12/16 18:28:59 by moichou          ###   ########.fr       */
+/*   Created: 2023/12/17 20:19:22 by moichou           #+#    #+#             */
+/*   Updated: 2023/12/17 20:32:45 by moichou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_read(int fd, char *result)
 {
@@ -87,27 +87,27 @@ char	*ft_extract_rest(char *result)
 
 char	*get_next_line(int fd)
 {
-	static char	*result;
+	static char	*result[OPEN_MAX];
 	char		*line;
 
 	if (fd < 0 || fd > OPEN_MAX || BUFFER_SIZE <= 0 || BUFFER_SIZE > INT_MAX)
 		return (NULL);
-	if (!result)
+	if (!result[fd])
 	{
-		result = ft_strdup("");
-		if (!result)
+		result[fd] = ft_strdup("");
+		if (!result[fd])
 			return (NULL);
 	}
-	result = ft_read(fd, result);
-	if (!result)
+	result[fd] = ft_read(fd, result[fd]);
+	if (!result[fd])
 		return (NULL);
-	if (result[0] == '\0')
-		return (free(result), result = NULL, NULL);
-	line = ft_extract_line(result);
+	if (result[fd][0] == '\0')
+		return (free(result[fd]), result[fd] = NULL, NULL);
+	line = ft_extract_line(result[fd]);
 	if (!line)
-		return (free(result), result = NULL, NULL);
-	result = ft_extract_rest(result);
-	if (!result)
-		return (free(line), result = NULL, NULL);
+		return (free(result[fd]), result[fd] = NULL, NULL);
+	result[fd] = ft_extract_rest(result[fd]);
+	if (!result[fd])
+		return (free(line), result[fd] = NULL, NULL);
 	return (line);
 }
