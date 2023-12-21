@@ -6,13 +6,13 @@
 /*   By: moichou <moichou@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/28 21:15:54 by moichou           #+#    #+#             */
-/*   Updated: 2023/12/16 18:28:59 by moichou          ###   ########.fr       */
+/*   Updated: 2023/12/19 11:56:28 by moichou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_read(int fd, char *result)
+static char	*ft_read(int fd, char *result)
 {
 	char	*buffer;
 	int		count;
@@ -21,7 +21,7 @@ char	*ft_read(int fd, char *result)
 	if (!buffer)
 		return (free(result), result = NULL, NULL);
 	count = 1;
-	while (ft_strsearch(result, '\n') == 0)
+	while (ft_strsearch(result, '\n') == 0 && result[0] != '\n')
 	{
 		count = read(fd, buffer, BUFFER_SIZE);
 		if (count == -1)
@@ -36,7 +36,7 @@ char	*ft_read(int fd, char *result)
 	return (free(buffer), result);
 }
 
-char	*ft_extract_line(char *result)
+static char	*ft_extract_line(char *result)
 {
 	char	*str;
 	int		i;
@@ -60,7 +60,7 @@ char	*ft_extract_line(char *result)
 	return (str);
 }
 
-char	*ft_extract_rest(char *result)
+static char	*ft_extract_rest(char *result)
 {
 	char	*str;
 	int		i;
